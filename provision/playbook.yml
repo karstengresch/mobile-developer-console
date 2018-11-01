@@ -1,0 +1,107 @@
+---
+- hosts: all
+
+  tasks:
+    - name: install docker dependencies
+      yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+        - yum-utils
+        - device-mapper-persistent-data
+        - lvm2
+
+    - name: set up docker repository
+      shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+    - name: install docker
+      yum:
+        name: docker-ce
+
+    - name: start docker
+      systemd:
+        state: started
+        enabled: yes
+        name: docker
+
+    - name: add vagrant user to docker group
+      shell: usermod -aG docker vagrant
+
+    - name: os stat
+      stat:
+        path: /usr/bin/oc
+      register: oc_stat
+
+    - name: get oc
+      unarchive:
+        src: https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
+        dest: ~/
+        remote_src: yes
+      when: oc_stat.stat.exists == False
+
+    - name: move oc to /usr/bin
+      command: mv ~/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/oc /usr/bin/oc
+      when: oc_stat.stat.exists == False
+
+    - name: configure docker
+      copy:
+        src: daemon.json
+        dest: /etc/docker/daemon.json
+
+    - name: restart docker
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: docker
+
+    - block:
+        - name: reset ssh connection
+          meta: reset_connection
+
+        - name: oc cluster up
+          shell: oc cluster up --public-hostname={{ host_ip }}.nip.io --routing-suffix={{ host_ip }}.nip.io
+
+        - name: oc login
+          shell: oc login -u system:admin
+
+        - name: add service-catalog
+          shell: oc cluster add service-catalog
+
+        - name: add automation-service-broker
+          shell: oc cluster add automation-service-broker
+
+        - name: add template-service-broker
+          shell: oc cluster add template-service-broker
+
+        - name: give admin user cluster_admin role
+          shell: oc adm policy add-cluster-role-to-user cluster-admin admin
+
+        - name: copy mobile.next install script
+          copy:
+            src: ../scripts/post_install.sh
+            dest: ~/post_install.sh
+            mode: +x
+
+        - name: copy config files
+          copy:
+            src: "{{ item }}"
+            dest: "~/"
+          with_items:
+            - ../deploy/crd.yaml
+            - ../scripts/yml/aerogearcatalog_registry.yaml
+            - ../scripts/yml/update_instructions.yaml
+
+        - name: set up mobile.next
+          shell: ASB_PROJECT_NAME='openshift-automation-service-broker' ~/post_install.sh
+          args:
+            creates: ~/_tmp-asb-template.yaml
+
+        - name: get cluster status
+          shell: oc cluster status
+          register: cluster_status
+
+        - name: output cluster status
+          debug:
+            msg: "{{ cluster_status.stdout }}"
+      become: yes
+      become_user: vagrant
