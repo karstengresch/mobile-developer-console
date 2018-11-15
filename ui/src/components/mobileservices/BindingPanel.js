@@ -97,8 +97,8 @@ class BindingPanel extends Component {
   stepChanged = step => {
     if (step === 2) {
       this.setState({ loading: true });
-      const credentialSecretName = createSecretName(`${this.state.service.serviceInstanceName}-credentials-`);
-      const parametersSecretName = createSecretName(`${this.state.service.serviceInstanceName}-bind-parameters-`);
+      const credentialSecretName = createSecretName(`${this.state.service.serviceInstanceName}-credentials`);
+      const parametersSecretName = createSecretName(`${this.state.service.serviceInstanceName}-bind-parameters`);
       this.props.createBinding(
         this.props.appName,
         this.state.service.serviceInstanceName,
