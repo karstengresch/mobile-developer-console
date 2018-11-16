@@ -173,15 +173,15 @@ const resourceReducer = actions => (state = defaultState, action) => {
       return {
         ...state,
         isReading: false,
-        items: [...state.items, action.result],
+        items: [action.result],
         errors: getErrors(null, 'read', state.errors)
       };
     case actions.deleteBindingsSuccess: 
       return {
         ...state,
-        isReading: false,
-        items: [...state.items, action.result],
-        errors: getErrors(null, 'read', state.errors)
+        isDeleting: false,
+        errors: getErrors(null, 'delete', state.errors),
+        items: [action.result]
       };
     default:
       return state;
