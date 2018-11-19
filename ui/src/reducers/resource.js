@@ -170,6 +170,9 @@ const resourceReducer = actions => (state = defaultState, action) => {
         errors: getErrors(action.error, 'action', state.errors)
       };
     case actions.readBindingsSuccess: 
+      console.log("Bindings read")
+      console.log(state.items)
+      console.log(action.result)
       return {
         ...state,
         isReading: false,
@@ -181,8 +184,13 @@ const resourceReducer = actions => (state = defaultState, action) => {
         ...state,
         isDeleting: false,
         errors: getErrors(null, 'delete', state.errors),
-        items: [action.result]
       };
+    case actions.createBindingsSuccess:
+      return {
+        ...state,
+        isCreating: false,
+        errors: getErrors(null, 'create', state.errors),
+      };      
     default:
       return state;
   }

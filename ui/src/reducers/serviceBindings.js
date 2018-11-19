@@ -16,7 +16,7 @@ const serviceBindings = resourceReducer({
   readBindingsSuccess: SERVICE_BINDINGS_SUCCESS,
   readFailure: SERVICE_BINDINGS_FAILURE,
   createRequest: SERVICE_BINDING_CREATE_REQUEST,
-  createSuccess: SERVICE_BINDING_CREATE_SUCCESS,
+  createBindingsSuccess: SERVICE_BINDING_CREATE_SUCCESS,
   createFailure: SERVICE_BINDING_CREATE_FAILURE,
   deleteRequest: SERVICE_BINDING_DELETE_REQUEST,
   deleteBindingsSuccess: SERVICE_BINDING_DELETE_SUCCESS,
