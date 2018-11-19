@@ -62,6 +62,7 @@ class MobileServiceView extends Component {
   }
 
   render() {
+    console.log(this.props.unboundServices)
     return (
       <div>
         {this.boundServiceRows()}
@@ -74,7 +75,6 @@ class MobileServiceView extends Component {
 function mapStateToProps(state) {
   if (state.serviceBindings.items && state.serviceBindings.items.length >= 1) {
     return {
-      nonce:Math.random(),
       boundServices: state.serviceBindings.items[0].boundServices,
       unboundServices: state.serviceBindings.items[0].unboundServices
     };
