@@ -169,28 +169,29 @@ const resourceReducer = actions => (state = defaultState, action) => {
         isActioning: false,
         errors: getErrors(action.error, 'action', state.errors)
       };
-    case actions.readBindingsSuccess: 
-      console.log("Bindings read")
-      console.log(state.items)
-      console.log(action.result)
+    case actions.readBindingsSuccess:
       return {
         ...state,
         isReading: false,
         items: [action.result],
         errors: getErrors(null, 'read', state.errors)
       };
-    case actions.deleteBindingsSuccess: 
+    case actions.deleteBindingsSuccess:
       return {
         ...state,
         isDeleting: false,
-        errors: getErrors(null, 'delete', state.errors),
+        errors: getErrors(null, 'delete', state.errors)
+        // Binding updates are fetched using a callback from a web service watcher.
+        // This just clears internal state watches.
       };
     case actions.createBindingsSuccess:
       return {
         ...state,
         isCreating: false,
-        errors: getErrors(null, 'create', state.errors),
-      };      
+        errors: getErrors(null, 'create', state.errors)
+        // Binding updates are fetched using a callback from a web service watcher.
+        // This just clears internal state watches.
+      };
     default:
       return state;
   }
